@@ -3,361 +3,224 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Nexus | Grok Liquid Engine</title>
+    <title>Nexus | MultiGPT</title>
     
     <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700;800&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* --- NEXUS LIQUID VARIABLES --- */
         :root {
-            --accent: #ff4500;
-            --accent-glow: rgba(255, 69, 0, 0.4);
-            --bg-color: #030303;
-            --text-color: #ffffff;
-            --glass-bg: rgba(20, 20, 20, 0.4);
-            --glass-blur: 65px;
-            --glass-border: rgba(255, 255, 255, 0.15);
-            --glass-border-light: rgba(255, 255, 255, 0.3);
-            --shadow-heavy: 0 40px 120px rgba(0,0,0,0.8);
-            --spring: cubic-bezier(0.25, 1, 0.3, 1);
-            --spring-bouncy: cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --accent: #00ff88; 
+            --accent-glow: rgba(0, 255, 136, 0.3);
+            --bg-color: #050505;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-blur: 60px;
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --shadow-heavy: 0 40px 100px rgba(0,0,0,0.8);
             --tx: 0px; --ty: 0px;
         }
 
-        [data-theme="light"] {
-            --bg-color: #f2f2f7;
-            --text-color: #000000;
-            --glass-bg: rgba(255, 255, 255, 0.5);
-            --glass-border: rgba(0, 0, 0, 0.1);
-            --glass-border-light: rgba(255, 255, 255, 0.8);
-            --shadow-heavy: 0 30px 60px rgba(0,0,0,0.1);
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-color); color: white; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+
+        /* --- THE LIQUID BACKGROUND --- */
+        #bg-canvas { 
+            position: fixed; inset: -10%; z-index: -3; 
+            background-image: radial-gradient(circle at 20% 30%, #004d33, transparent 40%), radial-gradient(circle at 80% 70%, #002244, transparent 50%);
+            filter: blur(var(--glass-blur)) saturate(180%); 
+            transform: translate(var(--tx), var(--ty)); 
+            transition: transform 0.2s ease-out;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); scrollbar-width: none; -webkit-font-smoothing: antialiased; }
-        ::-webkit-scrollbar { display: none; }
-        ::selection { background: var(--accent); color: #fff; }
+        .nexus-wrapper { width: 94vw; height: 88vh; max-width: 1100px; display: flex; flex-direction: column; z-index: 10; animation: slideUp 0.6s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        body { background: var(--bg-color); color: var(--text-color); height: 100dvh; display: flex; align-items: center; justify-content: center; overflow: hidden; transition: background 0.8s ease; perspective: 1000px; }
-
-        /* --- DYNAMIC PARALLAX LIQUID BACKGROUND --- */
-        #bg-canvas { position: fixed; inset: -5%; z-index: -3; background-size: cover; background-position: center; filter: blur(var(--glass-blur)) saturate(150%) brightness(0.8); transform: translate(calc(var(--tx) * -0.3), calc(var(--ty) * -0.3)); transition: transform 0.2s linear, filter 0.8s ease; }
-        .mesh-gradient { position: fixed; inset: -10%; z-index: -2; background: radial-gradient(circle at 20% 30%, var(--accent-glow) 0%, transparent 50%), radial-gradient(circle at 80% 70%, var(--accent-glow) 0%, transparent 50%); opacity: 0.6; mix-blend-mode: screen; pointer-events: none; animation: breathe 10s infinite alternate ease-in-out; transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)); transition: transform 0.2s linear; }
-        
-        @keyframes breathe { 0% { transform: scale(1) translate(0,0); opacity: 0.4; } 100% { transform: scale(1.1) translate(20px, 20px); opacity: 0.7; } }
-        @keyframes slideUpFade { 0% { transform: translateY(40px) scale(0.95); opacity: 0; filter: blur(10px); } 100% { transform: translateY(0) scale(1); opacity: 1; filter: blur(0); } }
-        @keyframes bubblePop { 0% { transform: scale(0.8) translateY(15px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-
-        /* --- THE HEAVY IOS GLASS PANEL --- */
-        .nexus-wrapper { width: 92vw; height: 88dvh; max-width: 1000px; display: flex; flex-direction: column; animation: slideUpFade 0.8s var(--spring) forwards; }
-        
         .ios-panel {
-            flex: 1;
-            background: var(--glass-bg);
-            backdrop-filter: blur(var(--glass-blur)) saturate(200%);
-            -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(200%);
-            border-radius: 38px;
-            border: 1px solid var(--glass-border);
-            border-top: 1.5px solid var(--glass-border-light);
-            border-left: 1.5px solid var(--glass-border-light);
-            box-shadow: var(--shadow-heavy), inset 0 0 40px rgba(255,255,255,0.02);
-            display: flex; flex-direction: column; overflow: hidden; position: relative;
+            flex: 1; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+            border-radius: 35px; border: 1px solid var(--glass-border); border-top: 1px solid rgba(255,255,255,0.2);
+            box-shadow: var(--shadow-heavy); display: flex; flex-direction: column; overflow: hidden;
         }
 
-        /* Shine Reflection */
-        .ios-panel::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.02) 100%); border-radius: inherit; pointer-events: none; z-index: 10; }
+        .panel-header { padding: 20px 30px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.2); }
+        .sys-title { font-weight: 900; letter-spacing: 2px; color: var(--accent); font-size: 0.9rem; }
 
-        /* --- HEADER --- */
-        .panel-header { padding: 22px 30px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 11; background: rgba(0,0,0,0.1); }
-        .sys-title { font-weight: 900; letter-spacing: 3px; font-size: 0.9rem; opacity: 0.9; text-shadow: 0 0 20px var(--accent-glow); color: var(--accent); display: flex; align-items: center; gap: 10px; }
-        .status-dot { width: 8px; height: 8px; background: #34C759; border-radius: 50%; box-shadow: 0 0 10px #34C759; animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-
-        /* --- CHAT FLOW --- */
-        #view { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 11; scroll-behavior: smooth; }
+        #view { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
         
-        .bubble-wrap { display: flex; flex-direction: column; max-width: 82%; animation: bubblePop 0.5s var(--spring-bouncy) forwards; }
-        .bubble-wrap.me { align-self: flex-end; align-items: flex-end; }
-        .bubble-wrap.them { align-self: flex-start; align-items: flex-start; }
-
-        .bubble-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; padding: 0 4px; }
-        .meta-pfp { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); }
-        .meta-name { font-size: 0.75rem; font-weight: 700; opacity: 0.8; text-transform: uppercase; letter-spacing: 1px; }
-        .meta-time { font-size: 0.65rem; opacity: 0.5; }
-
-        .bubble { padding: 16px 22px; border-radius: 24px; font-size: 1.05rem; line-height: 1.5; position: relative; word-wrap: break-word; overflow-wrap: break-word; backdrop-filter: blur(20px); }
-        .bubble-wrap.me .bubble { background: linear-gradient(135deg, var(--accent), #ff8c00); color: white; border-bottom-right-radius: 6px; box-shadow: 0 10px 25px var(--accent-glow), inset 0 1px 2px rgba(255,255,255,0.3); border: none; }
-        .bubble-wrap.them .bubble { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light); border-bottom-left-radius: 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        /* Message Bubbles */
+        .bubble-wrap { display: flex; flex-direction: column; max-width: 85%; animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .bubble-wrap.me { align-self: flex-end; }
+        .bubble-wrap.them { align-self: flex-start; }
+        .bubble { padding: 14px 22px; border-radius: 22px; font-size: 1.05rem; line-height: 1.5; }
+        .me .bubble { background: var(--accent); color: #000; font-weight: 600; border-bottom-right-radius: 4px; box-shadow: 0 10px 20px var(--accent-glow); }
+        .them .bubble { background: rgba(255,255,255,0.07); border: 1px solid var(--glass-border); border-bottom-left-radius: 4px; }
         
-        .bubble img { width: 100%; border-radius: 16px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        
-        /* Typing Indicator */
-        #typing-indicator { align-self: flex-start; background: rgba(255,255,255,0.05); padding: 12px 20px; border-radius: 20px; border: 1px solid var(--glass-border); font-size: 0.9rem; opacity: 0; transition: 0.3s; transform: translateY(10px); display: none; margin-left: 30px; }
-        #typing-indicator.visible { opacity: 1; transform: translateY(0); display: inline-block; animation: bubblePop 0.3s var(--spring-bouncy); }
+        @keyframes pop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* --- INPUT DOCK --- */
-        .input-dock { padding: 25px 30px; background: rgba(0,0,0,0.2); border-top: 1px solid var(--glass-border); position: relative; z-index: 11; }
-        .input-pill { display: flex; align-items: center; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-border-light); border-radius: 100px; padding: 8px 8px 8px 25px; box-shadow: inset 0 4px 15px rgba(0,0,0,0.2); transition: border-color 0.4s var(--spring); }
-        .input-pill:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow), inset 0 2px 10px rgba(0,0,0,0.2); transform: translateY(-2px); }
-        .input-pill input { flex: 1; background: transparent; border: none; color: var(--text-color); font-size: 1.1rem; outline: none; }
-        .input-pill input:disabled { opacity: 0.5; cursor: not-allowed; }
-        .send-btn { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: white; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.3s var(--spring-bouncy); box-shadow: 0 5px 15px var(--accent-glow); }
-        .send-btn:hover { transform: scale(1.1); }
-        .send-btn:active { transform: scale(0.9); }
+        /* Input area */
+        .input-dock { padding: 20px 30px; background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); }
+        .input-pill { display: flex; align-items: center; background: rgba(255,255,255,0.05); border-radius: 100px; padding: 8px 10px 8px 25px; border: 1px solid var(--glass-border); }
+        .input-pill input { flex: 1; background: transparent; border: none; color: white; outline: none; font-size: 1.05rem; }
+        .send-btn { width: 42px; height: 42px; border-radius: 50%; background: var(--accent); border: none; color: #000; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .send-btn:hover { transform: scale(1.05); }
+        .send-btn:active { transform: scale(0.95); }
 
-        /* --- FLOATING DOCK --- */
-        .dock-wrapper { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; background: var(--glass-bg); backdrop-filter: blur(var(--glass-blur)) saturate(200%); border: 1px solid var(--glass-border); border-top: 1.5px solid var(--glass-border-light); padding: 12px 28px; border-radius: 100px; box-shadow: 0 20px 50px rgba(0,0,0,0.6); transition: 0.6s var(--spring); z-index: 9000; }
-        .dock-wrapper.stealth { transform: translate(-50%, 150%); opacity: 0; pointer-events: none; }
-        
-        .dock-icon { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--text-color); font-size: 1.2rem; cursor: pointer; transition: 0.3s var(--spring-bouncy); background: rgba(255,255,255,0.05); }
-        .dock-icon:hover { background: var(--accent); color: white; transform: scale(1.15) translateY(-5px); box-shadow: 0 10px 20px var(--accent-glow); }
-        .dock-divider { width: 2px; height: 30px; background: var(--glass-border); margin: auto 5px; border-radius: 2px; }
+        .loading-text { font-size: 0.8rem; opacity: 0.5; margin-left: 30px; margin-bottom: 10px; display: none; }
 
-        .stealth-trigger { position: fixed; bottom: -40px; left: 50%; transform: translateX(-50%); width: 100px; height: 6px; background: rgba(255,255,255,0.5); border-radius: 10px; cursor: pointer; z-index: 8999; transition: 0.4s var(--spring); }
-        .stealth-trigger.visible { bottom: 10px; }
-        .stealth-trigger:hover { background: var(--accent); height: 8px; box-shadow: 0 0 15px var(--accent-glow); }
+        /* Dock */
+        .dock { position: fixed; bottom: 20px; display: flex; gap: 12px; background: rgba(20,20,20,0.7); backdrop-filter: blur(20px); padding: 10px 20px; border-radius: 100px; border: 1px solid var(--glass-border); box-shadow: var(--shadow-heavy); }
+        .dock-btn { width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer; transition: 0.2s; background: rgba(255,255,255,0.05); }
+        .dock-btn:hover { background: var(--accent); color: black; transform: translateY(-3px); }
 
-        /* --- CONTROL CENTER (SETTINGS) --- */
-        #control-center { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(30px); z-index: 9999; display: none; align-items: flex-end; justify-content: center; padding: 20px; opacity: 0; transition: 0.4s ease; }
-        .cc-panel { background: var(--glass-bg); border: 1px solid var(--glass-border); border-top: 1.5px solid var(--glass-border-light); border-radius: 45px; width: 100%; max-width: 450px; padding: 40px; box-shadow: 0 30px 80px rgba(0,0,0,0.8); transform: translateY(100%); transition: 0.5s var(--spring-bouncy); position: relative; overflow: hidden;}
-        .cc-panel::after { content:''; position: absolute; inset:0; background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent); pointer-events: none; }
-
-        .cc-group { margin-bottom: 24px; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 28px; border: 1px solid var(--glass-border); position: relative; z-index: 2;}
-        .cc-label { font-size: 0.8rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; opacity: 0.7; display: block; }
-        
-        .cc-color-grid { display: flex; gap: 15px; flex-wrap: wrap; }
-        .color-dot { width: 38px; height: 38px; border-radius: 50%; cursor: pointer; transition: 0.3s var(--spring-bouncy); border: 3px solid transparent; box-shadow: inset 0 2px 10px rgba(255,255,255,0.3); }
-        .color-dot.active { border-color: white; transform: scale(1.25); box-shadow: 0 0 15px currentColor; }
-        
-        input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+        img.chat-img { width: 100%; border-radius: 18px; margin-top: 10px; border: 1px solid var(--glass-border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
     </style>
 </head>
-<body onmousemove="handleMove(event)">
+<body onmousemove="parallax(event)">
     <div id="bg-canvas"></div>
-    <div class="mesh-gradient"></div>
 
-    <div class="nexus-wrapper" id="ui">
+    <div class="nexus-wrapper">
         <main class="ios-panel">
             <div class="panel-header">
-                <span class="sys-title"><div class="status-dot"></div> GROK LIQUID ENGINE</span>
-                <i class="fas fa-microchip" style="opacity: 0.5;"></i>
+                <span class="sys-title">MultiGPT // DIRECT ENGINE</span>
+                <i class="fas fa-satellite-dish" style="color: var(--accent); font-size: 0.8rem;"></i>
             </div>
-            
             <div id="view"></div>
-            <div id="typing-indicator"><i class="fas fa-circle-notch fa-spin"></i> Synthesizing...</div>
-
+            <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> ANALYZING...</div>
             <div class="input-dock">
                 <div class="input-pill">
-                    <input type="text" id="msg-input" placeholder="Message Grok..." autocomplete="off" onkeypress="if(event.key==='Enter') push()">
-                    <button class="send-btn" onclick="push()"><i class="fas fa-arrow-up"></i></button>
+                    <input type="text" id="msg-input" placeholder="Message MultiGPT..." autocomplete="off" onkeypress="if(event.key==='Enter') push()">
+                    <button class="send-btn" id="send-btn" onclick="push()"><i class="fas fa-arrow-up"></i></button>
                 </div>
             </div>
         </main>
     </div>
 
-    <div class="dock-wrapper" id="dock">
-        <div class="dock-icon" onclick="toggleTheme()" title="Toggle Theme"><i class="fas fa-moon"></i></div>
-        <div class="dock-icon" onclick="toggleCC()" title="Control Center"><i class="fas fa-sliders-h"></i></div>
-        <div class="dock-divider"></div>
-        <div class="dock-icon" onclick="clearMemory()" title="Purge Memory"><i class="fas fa-trash-alt"></i></div>
-        <div class="dock-icon" onclick="toggleStealth()" title="Hide Dock"><i class="fas fa-eye-slash"></i></div>
-        <div class="dock-divider"></div>
-        <div class="dock-icon" onclick="panic()" style="color: #FF3B30;" title="Panic Button"><i class="fas fa-bolt"></i></div>
+    <div class="dock">
+        <div class="dock-btn" onclick="document.getElementById('bg-up').click()"><i class="fas fa-image"></i></div>
+        <div class="dock-btn" onclick="clearMem()"><i class="fas fa-trash"></i></div>
+        <div class="dock-btn" onclick="window.location.href='https://google.com'"><i class="fas fa-shield"></i></div>
     </div>
-    <div class="stealth-trigger" id="dock-reveal" onclick="toggleStealth()"></div>
 
-    <div id="control-center" onclick="if(event.target === this) toggleCC()">
-        <div class="cc-panel" id="cc-panel">
-            <h2 style="margin-bottom: 24px; font-weight: 800; letter-spacing: -1px;">Nexus Settings</h2>
-            
-            <div class="cc-group">
-                <span class="cc-label">Aura Color</span>
-                <div class="cc-color-grid">
-                    <div class="color-dot active" style="background:#ff4500; color:#ff4500;" onclick="setAccent('#ff4500', this)"></div>
-                    <div class="color-dot" style="background:#0A84FF; color:#0A84FF;" onclick="setAccent('#0A84FF', this)"></div>
-                    <div class="color-dot" style="background:#5E5CE6; color:#5E5CE6;" onclick="setAccent('#5E5CE6', this)"></div>
-                    <div class="color-dot" style="background:#30D158; color:#30D158;" onclick="setAccent('#30D158', this)"></div>
-                    <div class="color-dot" style="background:#FF2D55; color:#FF2D55;" onclick="setAccent('#FF2D55', this)"></div>
-                    <div class="color-dot" style="background:#FFFFFF; color:#FFFFFF;" onclick="setAccent('#FFFFFF', this)"></div>
-                </div>
-            </div>
-
-            <div class="cc-group">
-                <span class="cc-label">Glass Viscosity (Blur)</span>
-                <input type="range" min="10" max="120" value="65" oninput="document.documentElement.style.setProperty('--glass-blur', this.value+'px')">
-            </div>
-        </div>
-    </div>
+    <input type="file" id="bg-up" hidden accept="image/*" onchange="updateBg(this)">
 
     <script>
-        // ==========================================
-        // PASTE YOUR GOOGLE SCRIPT URL HERE:
-        // ==========================================
-        const GOOGLE_BRIDGE_URL = "https://script.google.com/macros/library/d/1jEIuj18Fdpw-zCwohKor68zyn1_fkoIq0Szi_mtrQD4lgqD4F-j4-uts/1";
-        
         const input = document.getElementById('msg-input');
         const view = document.getElementById('view');
-        const typingInd = document.getElementById('typing-indicator');
-        
-        let chatHistory = JSON.parse(localStorage.getItem('nexusGrokMemory')) || [];
-
-        // PFP Placeholders
-        const grokPfp = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23000'/><text x='50' y='65' font-family='Arial' font-size='40' font-weight='bold' fill='%23fff' text-anchor='middle'>X</text></svg>";
-        const userPfp = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23ffffff' opacity='0.2'/><circle cx='50' cy='40' r='15' fill='%23fff'/><path d='M20 90 Q 50 60 80 90' stroke='%23fff' stroke-width='10' fill='none'/></svg>";
+        const loading = document.getElementById('loading');
+        const sendBtn = document.getElementById('send-btn');
+        let mem = JSON.parse(localStorage.getItem('multigpt_direct_mem_v2')) || [];
 
         window.onload = () => {
-            loadSettings();
-            if (chatHistory.length === 0) {
-                renderBubble({ u: 'Grok', c: "Flux vision enabled. Liquid Network bypassed. Awaiting input.", t: Date.now() });
+            const savedBg = localStorage.getItem('nx_bg');
+            if(savedBg) document.getElementById('bg-canvas').style.backgroundImage = `url(${savedBg})`;
+            if(mem.length === 0) {
+                addBubble('MultiGPT', 'Direct encrypted link established. I am ready.');
             } else {
-                chatHistory.forEach(msg => {
-                    if(msg.content !== "[Image Generated]") {
-                        renderBubble({ u: msg.role === 'user' ? 'You' : 'Grok', c: msg.content, t: msg.time || Date.now() });
-                    } else {
-                        renderBubble({ u: 'Grok', c: "[Image in previous session]", t: msg.time || Date.now() });
-                    }
-                });
+                mem.forEach(m => addBubble(m.role === 'user' ? 'You' : 'MultiGPT', m.content, true));
             }
         };
 
-        // --- PARALLAX ENGINE ---
-        function handleMove(e) {
-            const px = (window.innerWidth / 2 - e.clientX) / 40;
-            const py = (window.innerHeight / 2 - e.clientY) / 40;
-            document.documentElement.style.setProperty('--tx', px + 'px');
-            document.documentElement.style.setProperty('--ty', py + 'px');
+        function parallax(e) {
+            const x = (window.innerWidth / 2 - e.clientX) / 50;
+            const y = (window.innerHeight / 2 - e.clientY) / 50;
+            document.documentElement.style.setProperty('--tx', x + 'px');
+            document.documentElement.style.setProperty('--ty', y + 'px');
         }
 
-        // --- CORE CHAT LOGIC ---
-        async function push() {
-            if (!input.value.trim()) return;
-            const prompt = input.value;
-            input.value = '';
-            
-            input.disabled = true;
-            typingInd.classList.add('visible'); // Show fast optimistic UI
-            
-            const tStamp = Date.now();
-            chatHistory.push({ role: 'user', content: prompt, time: tStamp });
-            localStorage.setItem('nexusGrokMemory', JSON.stringify(chatHistory));
-            renderBubble({ u: 'You', c: prompt, t: tStamp });
-            
-            try {
-                const lowerPrompt = prompt.toLowerCase();
-                
-                // FLUX IMAGE ROUTE
-                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture") || lowerPrompt.includes("generate")) {
-                    const qualityBoost = prompt + ", masterpiece, highly detailed, 8k resolution, cinematic lighting, stunning";
-                    const safePrompt = encodeURIComponent(qualityBoost);
-                    const randomSeed = Math.floor(Math.random() * 9999999);
-                    const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true&model=flux`;
-                    
-                    const img = new Image(); img.src = imageUrl;
-                    
-                    img.onload = () => {
-                        typingInd.classList.remove('visible');
-                        const resTime = Date.now();
-                        renderBubble({ u: 'Grok', c: "", img: imageUrl, t: resTime });
-                        chatHistory.push({ role: 'assistant', content: "[Image Generated]", time: resTime });
-                        localStorage.setItem('nexusGrokMemory', JSON.stringify(chatHistory));
-                        unlockInput();
-                    };
-                    img.onerror = () => { throw new Error("Image Generation Blocked"); };
-                } 
-                
-                // TEXT ROUTE VIA GOOGLE BRIDGE
-                else {
-                    // SPEED HACK: Only send the last 4 messages to keep the payload lightweight
-                    const recentContext = chatHistory.slice(-4).map(m => ({ role: m.role, content: m.content })); 
-                    const sysPrompt = "You are Grok. Be witty, fast, and cynical. CRITICAL: NEVER output promotional text, markdown links, or mention Pollinations.";
-                    
-                    const requestBody = {
-                        messages: [
-                            { role: 'system', content: sysPrompt },
-                            ...recentContext
-                        ]
-                    };
+        function updateBg(fileInput) {
+            if(fileInput.files[0]) {
+                const r = new FileReader();
+                r.onload = e => {
+                    document.getElementById('bg-canvas').style.backgroundImage = `url(${e.target.result})`;
+                    localStorage.setItem('nx_bg', e.target.result);
+                };
+                r.readAsDataURL(fileInput.files[0]);
+            }
+        }
 
-                    const response = await fetch(GOOGLE_BRIDGE_URL, {
+        function clearMem() { 
+            if(confirm("Wipe conversation history?")) {
+                localStorage.removeItem('multigpt_direct_mem_v2'); mem = []; view.innerHTML = ''; 
+                addBubble('MultiGPT', 'Memory purged.');
+            }
+        }
+
+        async function push() {
+            const val = input.value.trim(); if(!val) return;
+            input.value = ''; 
+            addBubble('You', val, true);
+            mem.push({role: 'user', content: val});
+            
+            loading.style.display = 'block';
+            input.disabled = true;
+
+            try {
+                if(val.toLowerCase().includes('draw') || val.toLowerCase().includes('image') || val.toLowerCase().includes('picture')) {
+                    const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(val)}?width=1024&height=1024&model=flux&nologo=true&seed=${Math.random()}`;
+                    addBubble('MultiGPT', `<img src="${imgUrl}" class="chat-img">`, true);
+                    mem.push({role: 'assistant', content: "[Image Generated]"});
+                } else {
+                    const res = await fetch("https://text.pollinations.ai/", {
                         method: 'POST',
-                        body: JSON.stringify(requestBody) 
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            messages: [
+                                {role:'system', content:'You are MultiGPT. Concise, intelligent, and helpful. DO NOT output JSON formatting or internal reasoning steps.'}, 
+                                ...mem.slice(-5)
+                            ],
+                            model: "openai" 
+                        })
                     });
                     
-                    if (!response.ok) throw new Error("Bridge Connection Failed");
-                    let text = await response.text();
+                    let text = await res.text();
+
+                    // --- THE GLITCH SCRUBBER ---
+                    if (text.includes("reasoning_content") || text.startsWith("{")) {
+                        try {
+                            const parsed = JSON.parse(text);
+                            text = parsed.content || (parsed.choices && parsed.choices[0].message.content) || text;
+                        } catch(e) {
+                            // Fallback string manipulation if JSON is malformed
+                            if (text.includes('"content":"')) {
+                                text = text.split('"content":"')[1].split('","')[0].replace(/\\n/g, '\n').replace(/\\"/g, '"');
+                            }
+                        }
+                    }
+
+                    const bubbleElement = addBubble('MultiGPT', '');
+                    const bubbleContent = bubbleElement.querySelector('.bubble');
+                    let i = 0;
+                    const speed = 12; // Typewriter speed
                     
-                    // Ad-Scrubber
-                    text = text.replace(/^```html\n?|```$/g, '').trim(); 
-                    text = text.replace(/(\n|^).*?(discord|pollinations|chat).*?(http|\.com|\.gg).*/gi, '').trim(); 
-                    text = text.replace(/Join our Discord.*/gi, '').trim(); 
-                    
-                    typingInd.classList.remove('visible');
-                    const resTime = Date.now();
-                    renderBubble({ u: 'Grok', c: text, t: resTime });
-                    
-                    chatHistory.push({ role: 'assistant', content: text, time: resTime });
-                    localStorage.setItem('nexusGrokMemory', JSON.stringify(chatHistory));
-                    unlockInput();
+                    function typeEffect() {
+                        if (i < text.length) {
+                            bubbleContent.innerText += text.charAt(i);
+                            i++;
+                            view.scrollTop = view.scrollHeight;
+                            setTimeout(typeEffect, speed);
+                        }
+                    }
+                    typeEffect();
+
+                    mem.push({role: 'assistant', content: text});
                 }
-            } catch (err) {
-                typingInd.classList.remove('visible');
-                renderBubble({ u: 'System', c: `<span style="color:#ff4444;">ERROR: ${err.message}</span>`, t: Date.now() });
-                unlockInput();
+                localStorage.setItem('multigpt_direct_mem_v2', JSON.stringify(mem.slice(-15)));
+            } catch (e) {
+                addBubble('SYSTEM', `Error: ${e.message}`, true);
+            } finally {
+                loading.style.display = 'none';
+                input.disabled = false;
+                input.focus();
             }
         }
 
-        // --- UI RENDER ENGINE ---
-        function renderBubble(d) {
-            const isMe = d.u === 'You';
-            const timeObj = new Date(d.t);
-            const timeStr = isNaN(timeObj) ? "" : timeObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            
+        function addBubble(u, c, skipTypewriter = false) {
             const div = document.createElement('div');
-            div.className = `bubble-wrap ${isMe ? 'me' : 'them'}`;
-            
-            let html = `<div class="bubble-meta">`;
-            if(!isMe) html += `<img src="${d.u === 'Grok' ? grokPfp : userPfp}" class="meta-pfp">`;
-            html += `<span class="meta-name">${d.u}</span><span class="meta-time">${timeStr}</span></div>
-                     <div class="bubble">${d.c}`;
-            if(d.img) html += `<img src="${d.img}">`;
-            html += `</div>`;
-            
-            div.innerHTML = html;
+            div.className = `bubble-wrap ${u === 'You' ? 'me' : 'them'}`;
+            div.innerHTML = `<div style="font-size:0.65rem; margin-bottom:4px; opacity:0.5; padding-left:10px;">${u.toUpperCase()}</div><div class="bubble">${skipTypewriter ? c : ''}</div>`;
             view.appendChild(div); 
-            setTimeout(() => { view.scrollTop = view.scrollHeight; }, 50);
-        }
-
-        function unlockInput() {
-            input.disabled = false;
-            setTimeout(() => input.focus(), 100);
-        }
-
-        function clearMemory() {
-            if(confirm("Purge Grok's memory bank?")) {
-                chatHistory = []; localStorage.removeItem('nexusGrokMemory'); view.innerHTML = '';
-                renderBubble({ u: 'System', c: "Neural net purged. Ready for a new session.", t: Date.now() });
-            }
-        }
-
-        // --- NEXUS CONTROLS ---
-        function toggleStealth() { document.getElementById('dock').classList.toggle('stealth'); document.getElementById('dock-reveal').classList.toggle('visible'); }
-        function toggleCC() { const cc = document.getElementById('control-center'), p = document.getElementById('cc-panel'); if(cc.style.display === 'flex') { p.style.transform='translateY(100%)'; cc.style.opacity='0'; setTimeout(()=>cc.style.display='none',400); } else { cc.style.display='flex'; setTimeout(()=>{cc.style.opacity='1'; p.style.transform='translateY(0)';},10); } }
-        function toggleTheme() { const b = document.body; b.setAttribute('data-theme', b.getAttribute('data-theme')==='light'?'dark':'light'); localStorage.setItem('nx_theme_grok', b.getAttribute('data-theme')); }
-        function panic() { window.location.href = "https://google.com"; }
-        
-        function setAccent(hex, el) {
-            document.documentElement.style.setProperty('--accent', hex);
-            let r = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-            if(r) { document.documentElement.style.setProperty('--accent-glow', `rgba(${parseInt(r[1],16)}, ${parseInt(r[2],16)}, ${parseInt(r[3],16)}, 0.4)`); }
-            document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active')); if(el) el.classList.add('active');
-            localStorage.setItem('nx_color_grok', hex);
-        }
-
-        function loadSettings() {
-            if(localStorage.getItem('nx_theme_grok') === 'light') document.body.setAttribute('data-theme', 'light');
-            const col = localStorage.getItem('nx_color_grok'); if(col) { const dots = document.querySelectorAll('.color-dot'); let match = Array.from(dots).find(d=>d.style.background.includes(col)); setAccent(col, match||dots[0]); }
+            view.scrollTop = view.scrollHeight;
+            return div;
         }
     </script>
 </body>
