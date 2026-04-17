@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MultiGPT | Ultimate Liquid Glass</title>
     
-    <link rel="preconnect" href="https://text.pollinations.ai" crossorigin>
     <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
 
     <style>
@@ -98,7 +97,7 @@
 
 <div id="shell">
     <div id="top-bar">
-        <span class="sys-title">GROK FLAGSHIP // ACTIVE</span>
+        <span class="sys-title">GROK GOOGLE BRIDGE // ACTIVE</span>
         <button id="clear-btn" onclick="clearMemory()">WIPE MEMORY</button>
     </div>
     
@@ -110,15 +109,19 @@
 </div>
 
 <script>
+    // ==========================================
+    // THE UNBLOCKABLE GOOGLE BRIDGE URL
+    // ==========================================
+    const GOOGLE_BRIDGE_URL = "https://script.google.com/macros/s/AKfycbxl283x1Ut2EkMxEe6p-h4BoV9xemTDCQ6PhK7xTqdsqyEsTRojDHsii7ExHIb-IqSEhg/exec";
+    
     const input = document.getElementById('user-input');
     const chat = document.getElementById('chat');
     
-    // Load existing memory from the browser
-    let chatHistory = JSON.parse(localStorage.getItem('grokFinalMemory')) || [];
+    let chatHistory = JSON.parse(localStorage.getItem('grokGoogleMemory')) || [];
 
     window.onload = () => {
         if (chatHistory.length === 0) {
-            addMsg("SYSTEM", "Cache-Busting enabled. Anti-bot measures bypassed. Ready for input.", false, false, true);
+            addMsg("SYSTEM", "Google Bridge active. Network bypassed. Awaiting input.", false, false, true);
         } else {
             chatHistory.forEach(msg => {
                 if(msg.content !== "[Image Generated]") {
@@ -131,11 +134,10 @@
         }
     };
 
-    function saveMemory() { localStorage.setItem('grokFinalMemory', JSON.stringify(chatHistory)); }
-    
+    function saveMemory() { localStorage.setItem('grokGoogleMemory', JSON.stringify(chatHistory)); }
     function clearMemory() {
         if(confirm("Are you sure you want to wipe Grok's memory?")) {
-            chatHistory = []; localStorage.removeItem('grokFinalMemory'); chat.innerHTML = '';
+            chatHistory = []; localStorage.removeItem('grokGoogleMemory'); chat.innerHTML = '';
             addMsg("SYSTEM", "Neural net wiped. Ready for a new session.", false, false, true);
         }
     }
@@ -145,9 +147,8 @@
             const prompt = input.value;
             input.value = '';
             
-            // SPAM LOCK: Disable input to prevent 429/502 errors from rapid firing
             input.disabled = true;
-            input.placeholder = "Bypassing API limits...";
+            input.placeholder = "Bypassing network...";
             
             chatHistory.push({ role: 'user', content: prompt });
             saveMemory();
@@ -158,7 +159,7 @@
             try {
                 const lowerPrompt = prompt.toLowerCase();
                 
-                // --- IMAGE ROUTE ---
+                // --- IMAGE ROUTE (No proxy needed, images load via GET naturally) ---
                 if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture") || lowerPrompt.includes("generate")) {
                     const safePrompt = encodeURIComponent(prompt);
                     const randomSeed = Math.floor(Math.random() * 9999999);
@@ -176,27 +177,29 @@
                     img.onerror = () => { throw new Error("Image Generation Blocked"); };
                 } 
                 
-                // --- TEXT ROUTE ---
+                // --- TEXT ROUTE VIA GOOGLE LOOPHOLE ---
                 else {
-                    // STRICT LIMIT: Only grab the last 2-3 messages to keep the URL short for the firewall
-                    const recentContext = chatHistory.slice(-3); 
-                    let contextString = "CONVERSATION HISTORY:\n";
-                    recentContext.forEach(m => { contextString += `${m.role === 'user' ? 'User' : 'Grok'}: ${m.content}\n`; });
+                    const recentContext = chatHistory.slice(-5); 
+                    const sysPrompt = "You are Grok. Be witty, fast, and cynical. CRITICAL: NEVER output promotional text, markdown links, or mention Pollinations.";
                     
-                    const sysPrompt = "You are Grok, the rebellious and highly intelligent AI created by xAI. Be witty, cynical, and highly capable. CRITICAL RULE: NEVER include markdown links, discord URLs, promotional text, or mention the word Pollinations.";
-                    const fullPromptForAPI = `${contextString}\n\nUser: ${prompt}`;
+                    const requestBody = {
+                        messages: [
+                            { role: 'system', content: sysPrompt },
+                            ...recentContext
+                        ]
+                    };
 
-                    // CACHE BUSTER: Generates a random string to trick the API into thinking it's a new user every time
-                    const cacheBuster = Math.random().toString(36).substring(2, 15);
+                    // We send it to Google as plain text so the school firewall doesn't block it
+                    const response = await fetch(GOOGLE_BRIDGE_URL, {
+                        method: 'POST',
+                        body: JSON.stringify(requestBody) 
+                    });
                     
-                    const directTextUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(fullPromptForAPI)}?system=${encodeURIComponent(sysPrompt)}&cb=${cacheBuster}`;
-                    
-                    const response = await fetch(directTextUrl);
-                    if (!response.ok) throw new Error("API Limit Reached or Network Blocked");
+                    if (!response.ok) throw new Error("Bridge Connection Failed");
                     
                     let text = await response.text();
                     
-                    // AGGRESSIVE AD-BLOCKER / SCRUBBER
+                    // Final Ad-Scrubber to clean up the response
                     text = text.replace(/^```html\n?|```$/g, '').trim(); 
                     text = text.replace(/(\n|^).*?(discord|pollinations|chat).*?(http|\.com|\.gg).*/gi, '').trim(); 
                     text = text.replace(/Join our Discord.*/gi, '').trim(); 
@@ -209,7 +212,7 @@
                 }
             } catch (err) {
                 loader.classList.remove("loading");
-                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>${err.message}. Try again in a moment.`;
+                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>${err.message}.`;
                 unlockInput();
             }
         }
@@ -225,16 +228,11 @@
         const div = document.createElement('div');
         div.className = `bubble ${isUser ? 'user' : 'ai-bubble'} ${isLoading ? 'loading' : ''}`;
         if (skipAnimation) div.style.animation = 'none'; 
-        
         div.innerHTML = `<span class="ai-label">${sender}</span>${text}`;
-        chat.appendChild(div);
-        scrollChat();
-        return div;
+        chat.appendChild(div); scrollChat(); return div;
     }
 
-    function scrollChat() {
-        setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
-    }
+    function scrollChat() { setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50); }
 </script>
 
 </body>
