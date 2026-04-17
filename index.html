@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiGPT | Hyper-Liquid Glass</title>
+    <title>MultiGPT | DeepSeek Hyper-Liquid</title>
     
     <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
 
@@ -13,8 +13,8 @@
             --glass-bg: rgba(255, 255, 255, 0.02); 
             --glass-refraction: rgba(255, 255, 255, 0.2);
             --glass-shadow: rgba(0, 0, 0, 0.8);
-            --accent: #ff4500; 
-            --accent-glow: rgba(255, 69, 0, 0.5);
+            --accent: #00d4ff; /* Changed to DeepSeek Blue */
+            --accent-glow: rgba(0, 212, 255, 0.5);
             --text-main: #ffffff;
         }
 
@@ -23,9 +23,9 @@
             margin: 0; padding: 0; height: 100%; 
             background-color: #030303;
             background-image: 
-                radial-gradient(circle at 15% 50%, rgba(40, 10, 0, 0.8), transparent 40%),
-                radial-gradient(circle at 85% 30%, rgba(20, 0, 50, 0.6), transparent 50%),
-                radial-gradient(circle at 50% 80%, rgba(60, 20, 0, 0.7), transparent 60%);
+                radial-gradient(circle at 15% 50%, rgba(0, 40, 60, 0.8), transparent 40%),
+                radial-gradient(circle at 85% 30%, rgba(0, 20, 50, 0.6), transparent 50%),
+                radial-gradient(circle at 50% 80%, rgba(0, 60, 40, 0.7), transparent 60%);
             background-size: 200% 200%;
             animation: viscousFlow 18s cubic-bezier(0.4, 0, 0.2, 1) infinite alternate;
             font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
@@ -50,7 +50,6 @@
             border: 1px solid rgba(255, 255, 255, 0.05); 
             border-radius: 40px; 
             display: flex; flex-direction: column; 
-            /* Multi-layered shadows for depth and edge lighting */
             box-shadow: 
                 0 40px 120px var(--glass-shadow), 
                 inset 0 1px 2px var(--glass-refraction),
@@ -60,7 +59,6 @@
             transform-style: preserve-3d;
         }
 
-        /* Specular Surface Reflection (The "Shine") */
         #shell::after {
             content: ''; position: absolute; inset: 0;
             background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 30%, transparent 70%, rgba(255,255,255,0.03) 100%);
@@ -82,7 +80,7 @@
             padding: 8px 22px; border-radius: 30px; font-size: 0.75rem; cursor: pointer; transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); font-weight: 700; letter-spacing: 1px;
             backdrop-filter: blur(10px);
         }
-        #clear-btn:hover { background: rgba(255,69,0,0.15); border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-1px); }
+        #clear-btn:hover { background: rgba(0,212,255,0.15); border-color: var(--accent); box-shadow: 0 0 25px var(--accent-glow); transform: translateY(-1px); }
 
         #chat::-webkit-scrollbar { width: 4px; }
         #chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
@@ -96,12 +94,11 @@
             backdrop-filter: blur(20px);
         }
         
-        .user { align-self: flex-end; background: linear-gradient(135deg, var(--accent), #ff8c00); color: black; border: none; border-bottom-right-radius: 6px; font-weight: 500; box-shadow: 0 10px 30px var(--accent-glow), inset 0 1px 2px rgba(255,255,255,0.4); }
+        .user { align-self: flex-end; background: linear-gradient(135deg, var(--accent), #0055ff); color: white; border: none; border-bottom-right-radius: 6px; font-weight: 500; box-shadow: 0 10px 30px var(--accent-glow), inset 0 1px 2px rgba(255,255,255,0.4); }
         .ai-bubble { border-bottom-left-radius: 6px; }
 
         img { width: 100%; height: auto; max-height: 500px; object-fit: cover; border-radius: 18px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 15px 40px rgba(0,0,0,0.6); }
         .ai-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; opacity: 0.6; margin-bottom: 8px; display: block; text-transform: uppercase; color: rgba(255,255,255,0.8); }
-        .user .ai-label { color: rgba(0,0,0,0.6); }
 
         .input-wrap { padding: 35px 40px; display: flex; justify-content: center; background: rgba(0,0,0,0.2); border-top: 1px solid rgba(255,255,255,0.05); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; position: relative; z-index: 11; }
         
@@ -110,7 +107,7 @@
             background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.15); 
             border-radius: 100px; color: white; font-size: 1.1rem; outline: none; 
             transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
-            box-shadow: inset 0 4px 15px rgba(0,0,0,0.4), 0 0 0 rgba(255,69,0,0); 
+            box-shadow: inset 0 4px 15px rgba(0,0,0,0.4), 0 0 0 rgba(0,212,255,0); 
         }
         
         #user-input:focus { 
@@ -130,14 +127,14 @@
 
 <div id="shell">
     <div id="top-bar">
-        <span class="sys-title">GROK NEURAL CORE // HYPER-LIQUID</span>
+        <span class="sys-title">DEEPSEEK CORE // HYPER-LIQUID</span>
         <button id="clear-btn" onclick="clearMemory()">PURGE CONTEXT</button>
     </div>
     
     <div id="chat"></div>
     
     <div class="input-wrap">
-        <input type="text" id="user-input" placeholder="Message Grok..." autocomplete="off" autofocus>
+        <input type="text" id="user-input" placeholder="Message DeepSeek..." autocomplete="off" autofocus>
     </div>
 </div>
 
@@ -150,28 +147,28 @@
     const input = document.getElementById('user-input');
     const chat = document.getElementById('chat');
     
-    let chatHistory = JSON.parse(localStorage.getItem('grokLiquidMemory')) || [];
+    let chatHistory = JSON.parse(localStorage.getItem('deepseekLiquidMemory')) || [];
 
     window.onload = () => {
         if (chatHistory.length === 0) {
-            addMsg("SYSTEM", "Flux vision enabled. Network bypassed. Awaiting input.", false, false, true);
+            addMsg("SYSTEM", "DeepSeek reasoning engaged. Flux vision enabled. Network bypassed.", false, false, true);
         } else {
             chatHistory.forEach(msg => {
                 if(msg.content !== "[Image Generated]") {
-                    addMsg(msg.role === 'user' ? 'You' : 'Grok', msg.content, msg.role === 'user', false, true);
+                    addMsg(msg.role === 'user' ? 'You' : 'DeepSeek', msg.content, msg.role === 'user', false, true);
                 } else {
-                    addMsg('Grok', '[Image in previous session]', false, false, true);
+                    addMsg('DeepSeek', '[Image in previous session]', false, false, true);
                 }
             });
             scrollChat();
         }
     };
 
-    function saveMemory() { localStorage.setItem('grokLiquidMemory', JSON.stringify(chatHistory)); }
+    function saveMemory() { localStorage.setItem('deepseekLiquidMemory', JSON.stringify(chatHistory)); }
     function clearMemory() {
-        if(confirm("Purge Grok's memory bank?")) {
-            chatHistory = []; localStorage.removeItem('grokLiquidMemory'); chat.innerHTML = '';
-            addMsg("SYSTEM", "Neural net purged. Ready for a new session.", false, false, true);
+        if(confirm("Purge memory bank?")) {
+            chatHistory = []; localStorage.removeItem('deepseekLiquidMemory'); chat.innerHTML = '';
+            addMsg("SYSTEM", "Neural net purged. Ready.", false, false, true);
         }
     }
 
@@ -181,7 +178,7 @@
             input.value = '';
             
             input.disabled = true;
-            input.placeholder = "Bypassing network...";
+            input.placeholder = "DeepSeek is thinking...";
             
             chatHistory.push({ role: 'user', content: prompt });
             saveMemory();
@@ -195,12 +192,11 @@
                 // --- HIGH-FIDELITY FLUX IMAGE ROUTE ---
                 if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture") || lowerPrompt.includes("generate")) {
                     
-                    // Secretly inject high-quality rendering prompts to fix the "bad image" issue
                     const qualityBoost = prompt + ", masterpiece, highly detailed, 8k resolution, cinematic lighting, stunning";
                     const safePrompt = encodeURIComponent(qualityBoost);
                     const randomSeed = Math.floor(Math.random() * 9999999);
                     
-                    // Force the API to use the 'flux' model for vastly superior image generation
+                    // Flux model strictly enforced here
                     const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true&model=flux`;
                     
                     const img = new Image();
@@ -215,16 +211,17 @@
                     img.onerror = () => { throw new Error("Image Generation Blocked"); };
                 } 
                 
-                // --- TEXT ROUTE VIA GOOGLE LOOPHOLE ---
+                // --- DEEPSEEK TEXT ROUTE VIA GOOGLE LOOPHOLE ---
                 else {
                     const recentContext = chatHistory.slice(-5); 
-                    const sysPrompt = "You are Grok. Be witty, fast, and cynical. CRITICAL: NEVER output promotional text, markdown links, or mention Pollinations.";
+                    const sysPrompt = "You are an incredibly smart AI assistant powered by DeepSeek. Be concise, highly logical, and helpful. CRITICAL: NEVER output promotional text, markdown links, or mention Pollinations.";
                     
                     const requestBody = {
                         messages: [
                             { role: 'system', content: sysPrompt },
                             ...recentContext
-                        ]
+                        ],
+                        model: "deepseek" // <-- This single line explicitly tells the API to route your prompt to DeepSeek
                     };
 
                     const response = await fetch(GOOGLE_BRIDGE_URL, {
@@ -236,13 +233,13 @@
                     
                     let text = await response.text();
                     
-                    // Final Ad-Scrubber
+                    // Ad-Scrubber
                     text = text.replace(/^```html\n?|```$/g, '').trim(); 
                     text = text.replace(/(\n|^).*?(discord|pollinations|chat).*?(http|\.com|\.gg).*/gi, '').trim(); 
                     text = text.replace(/Join our Discord.*/gi, '').trim(); 
                     
                     loader.classList.remove("loading");
-                    loader.innerHTML = `<span class="ai-label">GROK</span>${text}`;
+                    loader.innerHTML = `<span class="ai-label">DEEPSEEK</span>${text}`;
                     
                     chatHistory.push({ role: 'assistant', content: text });
                     saveMemory(); scrollChat(); unlockInput();
@@ -257,7 +254,7 @@
 
     function unlockInput() {
         input.disabled = false;
-        input.placeholder = "Message Grok...";
+        input.placeholder = "Message DeepSeek...";
         setTimeout(() => input.focus(), 100);
     }
 
