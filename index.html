@@ -3,107 +3,156 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiGPT | Grok Memory Edge</title>
+    <title>MultiGPT | Stealth Glass</title>
     
     <link rel="preconnect" href="https://text.pollinations.ai" crossorigin>
     <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
 
     <style>
+        /* --- GLOBAL VARIABLES --- */
         :root { 
             --bg-dark: #050505; 
-            --glass-bg: rgba(20, 20, 25, 0.4); 
+            --glass-bg: rgba(20, 20, 25, 0.45); 
             --glass-border: rgba(255, 255, 255, 0.08);
             --accent: #ff4500; 
-            --accent-glow: rgba(255, 69, 0, 0.3);
+            --accent-glow: rgba(255, 69, 0, 0.35);
             --text-main: #f0f0f0;
         }
 
+        /* --- BASE STYLES --- */
         body, html { 
             margin: 0; padding: 0; height: 100%; 
-            background: radial-gradient(circle at 50% 50%, #111, var(--bg-dark));
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: radial-gradient(circle at 50% 50%, #1a1a1a, var(--bg-dark));
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
             color: var(--text-main); 
             display: flex; justify-content: center; align-items: center; 
             overflow: hidden;
         }
 
+        /* --- THE LIQUID GLASS SHELL --- */
         #shell { 
-            width: 90vw; height: 88vh; max-width: 1200px;
+            width: 92vw; height: 90vh; max-width: 1200px;
             background: var(--glass-bg); 
-            backdrop-filter: blur(35px) saturate(180%); 
-            -webkit-backdrop-filter: blur(35px) saturate(180%); 
+            backdrop-filter: blur(40px) saturate(180%); 
+            -webkit-backdrop-filter: blur(40px) saturate(180%); 
             border: 1px solid var(--glass-border); 
             border-radius: 35px; 
             display: flex; flex-direction: column; 
-            box-shadow: 0 25px 80px rgba(0,0,0,0.8), inset 0 0 40px rgba(255,255,255,0.02); 
+            box-shadow: 0 30px 90px rgba(0,0,0,0.9), inset 0 0 50px rgba(255,255,255,0.02); 
             position: relative;
         }
         
-        /* Top Bar for Memory Controls */
+        /* --- TOP MEMORY BAR --- */
         #top-bar {
-            padding: 15px 30px;
+            padding: 18px 35px;
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            border-top-left-radius: 35px; border-top-right-radius: 35px;
         }
 
-        .sys-title { font-weight: 800; letter-spacing: 2px; font-size: 0.8rem; opacity: 0.7; }
+        .sys-title { 
+            font-weight: 800; letter-spacing: 3px; font-size: 0.85rem; 
+            opacity: 0.8; text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(255,255,255,0.2);
+        }
         
         #clear-btn {
-            background: transparent; color: var(--text-main); border: 1px solid var(--glass-border);
-            padding: 5px 15px; border-radius: 20px; font-size: 0.75rem; cursor: pointer;
-            transition: 0.3s; opacity: 0.6;
+            background: rgba(255,255,255,0.03); color: var(--text-main); 
+            border: 1px solid var(--glass-border);
+            padding: 8px 18px; border-radius: 20px; font-size: 0.75rem; 
+            cursor: pointer; transition: all 0.3s ease; opacity: 0.7;
+            font-weight: 600; letter-spacing: 1px;
         }
-        #clear-btn:hover { background: rgba(255,69,0,0.2); border-color: var(--accent); opacity: 1; }
+        
+        #clear-btn:hover { 
+            background: rgba(255,69,0,0.15); border-color: var(--accent); 
+            opacity: 1; box-shadow: 0 0 15px var(--accent-glow);
+        }
 
+        /* --- CHAT AREA & SCROLLBAR --- */
         #chat::-webkit-scrollbar { width: 6px; }
-        #chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        #chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
 
         #chat { 
-            flex: 1; padding: 25px 40px; overflow-y: auto; 
-            display: flex; flex-direction: column; gap: 20px; scroll-behavior: smooth;
+            flex: 1; padding: 30px 40px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 24px; 
+            scroll-behavior: smooth;
         }
 
+        /* --- MESSAGE BUBBLES --- */
         .bubble { 
-            padding: 16px 24px; border-radius: 24px; 
-            background: rgba(255,255,255,0.04); 
-            max-width: 82%; line-height: 1.6; font-size: 0.98rem; 
-            border: 1px solid rgba(255,255,255,0.03); 
+            padding: 18px 26px; border-radius: 24px; 
+            background: rgba(255,255,255,0.05); 
+            max-width: 80%; line-height: 1.6; font-size: 1rem; 
+            border: 1px solid rgba(255,255,255,0.04); 
             animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
         
         .user { 
             align-self: flex-end; 
             background: linear-gradient(135deg, var(--accent), #ff7300); 
             color: white; font-weight: 500; 
-            box-shadow: 0 8px 25px var(--accent-glow); border: none; border-bottom-right-radius: 6px;
+            box-shadow: 0 8px 25px var(--accent-glow); border: none; 
+            border-bottom-right-radius: 6px;
         }
+        
         .ai-bubble { border-bottom-left-radius: 6px; }
 
-        img { width: 100%; height: auto; max-height: 450px; object-fit: cover; border-radius: 16px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.1); }
-        .ai-label { font-size: 0.65rem; font-weight: 800; letter-spacing: 1.5px; opacity: 0.6; margin-bottom: 6px; display: block; text-transform: uppercase; }
-
-        .input-wrap { padding: 25px 40px; display: flex; justify-content: center; background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border); border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; }
-        #user-input { width: 100%; max-width: 750px; padding: 20px 30px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; color: white; font-size: 1.05rem; outline: none; transition: 0.3s; }
-        #user-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.08); box-shadow: 0 0 25px var(--accent-glow); }
+        /* --- DYNAMIC MEDIA --- */
+        img { 
+            width: 100%; height: auto; max-height: 450px; 
+            object-fit: cover; border-radius: 16px; margin-top: 12px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+        }
         
+        .ai-label { 
+            font-size: 0.65rem; font-weight: 800; letter-spacing: 1.5px; 
+            opacity: 0.6; margin-bottom: 8px; display: block; 
+            text-transform: uppercase; 
+        }
+
+        /* --- INPUT AREA --- */
+        .input-wrap { 
+            padding: 30px 40px; display: flex; justify-content: center; 
+            background: rgba(0,0,0,0.35); border-top: 1px solid var(--glass-border); 
+            border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; 
+        }
+        
+        #user-input { 
+            width: 100%; max-width: 800px; padding: 22px 35px; 
+            background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 100px; color: white; font-size: 1.1rem; 
+            outline: none; transition: 0.3s; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        #user-input:focus { 
+            border-color: var(--accent); background: rgba(255,255,255,0.09); 
+            box-shadow: 0 0 30px var(--accent-glow), inset 0 2px 5px rgba(0,0,0,0.2); 
+        }
+        
+        /* --- ANIMATIONS --- */
         .loading { border-color: var(--accent); animation: glowPulse 1.5s infinite alternate; }
         
         @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes glowPulse { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 20px var(--accent-glow); } }
+        @keyframes glowPulse { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 25px var(--accent-glow); } }
     </style>
 </head>
 <body>
 
 <div id="shell">
     <div id="top-bar">
-        <span class="sys-title">GROK NEURAL LINK</span>
-        <button id="clear-btn" onclick="clearMemory()">CLEAR CONTEXT</button>
+        <span class="sys-title">GROK ENGINE // ACTIVE</span>
+        <button id="clear-btn" onclick="clearMemory()">WIPE CONTEXT</button>
     </div>
     
     <div id="chat"></div>
     
     <div class="input-wrap">
-        <input type="text" id="user-input" placeholder="Ask Grok... (Memory is Active)" autocomplete="off" autofocus>
+        <input type="text" id="user-input" placeholder="Message Grok... (Memory is Online)" autocomplete="off" autofocus>
     </div>
 </div>
 
@@ -111,14 +160,14 @@
     const input = document.getElementById('user-input');
     const chat = document.getElementById('chat');
 
-    // --- MEMORY SYSTEM ---
-    // Load from local storage or start fresh
-    let chatHistory = JSON.parse(localStorage.getItem('grokMemory')) || [];
+    // ==========================================
+    // 1. MEMORY MANAGEMENT SYSTEM
+    // ==========================================
+    let chatHistory = JSON.parse(localStorage.getItem('grokMemory_v2')) || [];
 
-    // Render history on page load
     window.onload = () => {
         if (chatHistory.length === 0) {
-            addMsg("SYSTEM", "Memory initialized. Grok is ready.", false, false, true);
+            addMsg("SYSTEM", "Direct uplink established. Memory active. Ready for input.", false, false, true);
         } else {
             chatHistory.forEach(msg => {
                 addMsg(msg.role === 'user' ? 'You' : 'Grok', msg.content, msg.role === 'user', false, true);
@@ -128,62 +177,64 @@
     };
 
     function saveMemory() {
-        localStorage.setItem('grokMemory', JSON.stringify(chatHistory));
+        localStorage.setItem('grokMemory_v2', JSON.stringify(chatHistory));
     }
 
     function clearMemory() {
-        if(confirm("Wipe Grok's memory? This clears the conversation context.")) {
+        if(confirm("Are you sure you want to wipe Grok's memory?")) {
             chatHistory = [];
-            localStorage.removeItem('grokMemory');
+            localStorage.removeItem('grokMemory_v2');
             chat.innerHTML = '';
-            addMsg("SYSTEM", "Context cleared. Tabula rasa.", false, false, true);
+            addMsg("SYSTEM", "Memory wiped. Starting fresh.", false, false, true);
         }
     }
 
-    // --- CHAT LOGIC ---
+    // ==========================================
+    // 2. CORE ROUTING & FETCH LOGIC
+    // ==========================================
     input.addEventListener('keypress', async (e) => {
         if (e.key === 'Enter' && input.value.trim()) {
             const prompt = input.value;
             input.value = '';
             
-            // 1. Save and render User message
+            // Render user message instantly and save to memory
             chatHistory.push({ role: 'user', content: prompt });
             saveMemory();
             addMsg("You", prompt, true);
             
-            const loader = addMsg("Engine", "Synthesizing...", false, true);
+            const loader = addMsg("Engine", "Processing direct fetch...", false, true);
             
             try {
                 const lowerPrompt = prompt.toLowerCase();
                 
-                // --- IMAGE ROUTE (No memory needed for images) ---
-                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture")) {
+                // --- IMAGE GENERATION ROUTE ---
+                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture") || lowerPrompt.includes("generate")) {
+                    
                     const safePrompt = encodeURIComponent(prompt);
                     const randomSeed = Math.floor(Math.random() * 1000000);
-                    const rawImageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true`;
-                    const cloakedImageUrl = `https://corsproxy.io/?${encodeURIComponent(rawImageUrl)}`;
+                    
+                    // Direct fetch to image generator (No proxy needed)
+                    const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true`;
                     
                     const img = new Image();
-                    img.src = cloakedImageUrl;
+                    img.src = imageUrl;
+                    
                     img.onload = () => {
                         loader.classList.remove("loading");
-                        const imgHTML = `<img src="${cloakedImageUrl}" alt="Generated Image">`;
+                        const imgHTML = `<img src="${imageUrl}" alt="Generated Image">`;
                         loader.innerHTML = `<span class="ai-label">VISION</span>${imgHTML}`;
                         
-                        // Save image response to memory as a description so Grok knows what it drew
-                        chatHistory.push({ role: 'assistant', content: "[Generated an Image]" });
+                        chatHistory.push({ role: 'assistant', content: "[Generated an Image based on your prompt]" });
                         saveMemory();
                         scrollChat();
                     };
-                    img.onerror = () => { throw new Error("Image Blocked"); };
+                    img.onerror = () => { throw new Error("Image block active"); };
                 } 
                 
-                // --- TEXT ROUTE (With Memory) ---
+                // --- TEXT GENERATION ROUTE ---
                 else {
-                    // Extract the last 6 messages to prevent the URL from getting too long for the firewall
+                    // Build contextual memory string (last 7 messages)
                     const recentContext = chatHistory.slice(-7); 
-                    
-                    // Format the history into a script Grok can read
                     let contextString = "CONVERSATION HISTORY:\n";
                     recentContext.forEach(m => {
                         contextString += `${m.role === 'user' ? 'User' : 'Grok'}: ${m.content}\n`;
@@ -192,40 +243,41 @@
                     const sysPrompt = "You are Grok. You are witty, rebellious, and highly intelligent. Use the CONVERSATION HISTORY provided to maintain context. Respond ONLY to the very last User message.";
                     const fullPromptForAPI = `${contextString}\n\nUser: ${prompt}`;
 
-                    const rawTextUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(fullPromptForAPI)}?system=${encodeURIComponent(sysPrompt)}`;
-                    const cloakedTextUrl = `https://corsproxy.io/?${encodeURIComponent(rawTextUrl)}`;
+                    // Direct fetch to text generator (Bypassing CORS proxy entirely)
+                    const directTextUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(fullPromptForAPI)}?system=${encodeURIComponent(sysPrompt)}`;
                     
-                    const response = await fetch(cloakedTextUrl);
-                    if (!response.ok) throw new Error("Network blocked");
+                    const response = await fetch(directTextUrl);
+                    
+                    if (!response.ok) throw new Error("Connection dropped");
                     
                     let text = await response.text();
+                    
+                    // Clean up markdown formatting
                     text = text.replace(/^```html\n?|```$/g, '').trim();
                     
-                    if (text.includes("<html") || text.includes("blocked") || text.includes("Fortinet") || text.includes("Securly")) {
-                        throw new Error("School Firewall Intercepted");
-                    }
-                    
-                    // Update UI
                     loader.classList.remove("loading");
                     loader.innerHTML = `<span class="ai-label">GROK</span>${text}`;
                     
-                    // Save Grok's response to memory
+                    // Save response to memory
                     chatHistory.push({ role: 'assistant', content: text });
                     saveMemory();
                     scrollChat();
                 }
             } catch (err) {
+                console.error(err);
                 loader.classList.remove("loading");
-                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>${err.message}`;
+                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>Network interrupted. The firewall might be deep-inspecting traffic.`;
             }
         }
     });
 
-    // Helper to add messages to the DOM
+    // ==========================================
+    // 3. UI HELPERS
+    // ==========================================
     function addMsg(sender, text, isUser = false, isLoading = false, skipAnimation = false) {
         const div = document.createElement('div');
         div.className = `bubble ${isUser ? 'user' : 'ai-bubble'} ${isLoading ? 'loading' : ''}`;
-        if (skipAnimation) div.style.animation = 'none'; // Prevents pop-in effect on load
+        if (skipAnimation) div.style.animation = 'none'; 
         
         div.innerHTML = `<span class="ai-label">${sender}</span>${text}`;
         chat.appendChild(div);
