@@ -3,92 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiGPT | Grok Liquid</title>
-    <script src="https://js.puter.com/v2/puter.js"></script>
+    <title>MultiGPT | Stealth Glass</title>
     <style>
         :root { --bg: #050505; --glass: rgba(255, 255, 255, 0.03); --accent: #ff4500; }
         body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: white; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #shell { width: 92vw; height: 88vh; background: var(--glass); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; display: flex; flex-direction: column; position: relative; }
+        #shell { width: 92vw; height: 88vh; background: var(--glass); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+        
         #chat { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none; }
-        .bubble { padding: 15px 22px; border-radius: 20px; background: rgba(255,255,255,0.06); max-width: 85%; line-height: 1.5; font-size: 0.95rem; }
-        .user { align-self: flex-end; background: var(--accent); font-weight: 600; box-shadow: 0 4px 15px rgba(255,69,0,0.2); }
+        .bubble { padding: 15px 22px; border-radius: 20px; background: rgba(255,255,255,0.06); max-width: 85%; line-height: 1.5; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.05); }
+        .user { align-self: flex-end; background: var(--accent); font-weight: 600; box-shadow: 0 4px 15px rgba(255,69,0,0.2); border: none; }
+        
         .input-wrap { padding: 25px; display: flex; justify-content: center; background: rgba(0,0,0,0.2); border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
         #user-input { width: 100%; max-width: 600px; padding: 18px 28px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; color: white; font-size: 1rem; outline: none; transition: 0.3s; }
-        #user-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); }
-        #auth-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; border-radius: 30px; backdrop-filter: blur(20px); text-align: center; padding: 20px; }
-        .btn { background: var(--accent); color: white; border: none; padding: 16px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 1.1rem; box-shadow: 0 0 20px rgba(255,69,0,0.4); }
+        #user-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); box-shadow: 0 0 20px rgba(255,69,0,0.3); }
+        
+        .ai-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; opacity: 0.5; margin-bottom: 5px; display: block; text-transform: uppercase; }
+        img { max-width: 100%; border-radius: 15px; margin-top: 10px; }
+        
+        /* Loading Animation */
+        .loading { animation: pulse 1.5s infinite; opacity: 0.7; }
+        @keyframes pulse { 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
 
 <div id="shell">
-    <div id="auth-overlay">
-        <h2 style="margin-bottom: 10px;">MULTIGPT</h2>
-        <p style="opacity: 0.6; margin-bottom: 30px; font-size: 0.9rem;">Grok-4 Browser Engine (Bypass Enabled)</p>
-        <button class="btn" onclick="startApp()">INITIATE CONNECTION</button>
-        <p id="adblock-notice" style="display:none; color:#ff4444; margin-top:15px; font-size:0.8rem;">Adblocker detected. If nothing happens, disable it for this page.</p>
-    </div>
-
     <div id="chat">
-        <div class="bubble"><b>Grok:</b> Connection encrypted. Liquid Glass active. Schools out, Grok is in. What's the move?</div>
+        <div class="bubble">
+            <span class="ai-label">SYSTEM</span>
+            Stealth connection established. Bypassing auth protocols. Ready for input.
+        </div>
     </div>
     <div class="input-wrap">
-        <input type="text" id="user-input" placeholder="Message Grok..." disabled>
+        <input type="text" id="user-input" placeholder="Type a message or ask for an image..." autocomplete="off">
     </div>
 </div>
 
 <script>
-    // 1. AD-BLOCKER DETECTION
-    window.onload = () => {
-        if (typeof puter === 'undefined') {
-            document.getElementById('adblock-notice').style.display = 'block';
-        }
-    };
-
-    // 2. CONNECT LOGIC
-    async function startApp() {
-        if (typeof puter === 'undefined') {
-            alert("Error: Script blocked. Disable your adblocker or school firewall.");
-            return;
-        }
-        try {
-            await puter.auth.signIn(); // Triggers the popup safely on click
-            document.getElementById('auth-overlay').style.display = 'none';
-            document.getElementById('user-input').disabled = false;
-            document.getElementById('user-input').focus();
-        } catch (e) {
-            console.error(e);
-            alert("Connection failed. Try opening this file on a live host like Netlify instead of locally.");
-        }
-    }
-
-    // 3. CHAT LOGIC
     const input = document.getElementById('user-input');
+    const chat = document.getElementById('chat');
+
     input.addEventListener('keypress', async (e) => {
         if (e.key === 'Enter' && input.value.trim()) {
-            const val = input.value;
+            const prompt = input.value;
             input.value = '';
-            addMsg("You", val, true);
             
-            const loader = addMsg("Grok", "Thinking...");
+            // Add user message
+            addMsg("You", prompt, true);
+            
+            // Add loading state
+            const loader = addMsg("Engine", "Bypassing firewall...", false, true);
             
             try {
-                // Using the latest 2026 model available via Puter
-                const response = await puter.ai.chat(val, { model: 'x-ai/grok-4-1-fast' });
-                loader.innerHTML = `<b>Grok:</b> ${response.message.content}`;
+                const lowerPrompt = prompt.toLowerCase();
+                
+                // IMAGE ROUTE
+                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture")) {
+                    // Pollinations image generation (Keyless)
+                    const safePrompt = encodeURIComponent(prompt);
+                    const randomSeed = Math.floor(Math.random() * 100000);
+                    const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=800&height=400&nologo=true`;
+                    
+                    loader.classList.remove("loading");
+                    loader.innerHTML = `<span class="ai-label">VISION</span><img src="${imageUrl}" alt="Generated Image" onload="scrollChat()">`;
+                } 
+                // TEXT ROUTE
+                else {
+                    // Pollinations text generation (Keyless)
+                    // We prompt it to act like Grok
+                    const sysPrompt = "You are Grok, a witty, rebellious, and highly intelligent AI.";
+                    const encodedUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(prompt)}?system=${encodeURIComponent(sysPrompt)}`;
+                    
+                    const response = await fetch(encodedUrl);
+                    if (!response.ok) throw new Error("Network blocked");
+                    
+                    const text = await response.text();
+                    loader.classList.remove("loading");
+                    loader.innerHTML = `<span class="ai-label">GROK</span>${text}`;
+                }
             } catch (err) {
-                loader.innerHTML = `<b>Error:</b> School filter blocked the response or credits empty.`;
+                loader.classList.remove("loading");
+                loader.innerHTML = `<span class="ai-label">ERROR</span>The school network is actively dropping the connection.`;
             }
+            scrollChat();
         }
     });
 
-    function addMsg(sender, text, isUser = false) {
+    function addMsg(sender, text, isUser = false, isLoading = false) {
         const div = document.createElement('div');
-        div.className = `bubble ${isUser ? 'user' : ''}`;
-        div.innerHTML = `<b>${sender}:</b> ${text}`;
-        document.getElementById('chat').appendChild(div);
-        document.getElementById('chat').scrollTop = document.getElementById('chat').scrollHeight;
+        div.className = `bubble ${isUser ? 'user' : ''} ${isLoading ? 'loading' : ''}`;
+        div.innerHTML = `<span class="ai-label">${sender}</span>${text}`;
+        chat.appendChild(div);
+        scrollChat();
         return div;
+    }
+
+    function scrollChat() {
+        chat.scrollTop = chat.scrollHeight;
     }
 </script>
 
