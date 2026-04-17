@@ -1,114 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiGPT | Pure Grok Terminal</title>
-    
-    <link rel="preconnect" href="https://text.pollinations.ai" crossorigin>
-    <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
-
-    <style>
-        /* --- GLOBAL VARIABLES & ULTRA-GLASS --- */
-        :root { 
-            --glass-bg: rgba(255, 255, 255, 0.04); 
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-highlight: rgba(255, 255, 255, 0.2);
-            --accent: #ff4500; 
-            --accent-glow: rgba(255, 69, 0, 0.4);
-            --text-main: #ffffff;
-        }
-
-        /* --- LIQUID ANIMATED BACKGROUND --- */
-        body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            background: linear-gradient(45deg, #050505, #1a0b00, #000a14, #11001c, #050505);
-            background-size: 400% 400%;
-            animation: liquidFlow 20s ease infinite;
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; 
-            color: var(--text-main); 
-            display: flex; justify-content: center; align-items: center; 
-            overflow: hidden;
-        }
-
-        @keyframes liquidFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        /* --- THE HEAVY GLASS SHELL --- */
-        #shell { 
-            width: 92vw; height: 90vh; max-width: 1200px;
-            background: var(--glass-bg); 
-            backdrop-filter: blur(50px) saturate(200%); 
-            -webkit-backdrop-filter: blur(50px) saturate(200%); 
-            border: 1px solid var(--glass-border); 
-            border-top: 1px solid var(--glass-highlight);
-            border-radius: 40px; 
-            display: flex; flex-direction: column; 
-            box-shadow: 0 30px 100px rgba(0,0,0,0.95), inset 0 0 80px rgba(255,255,255,0.03); 
-        }
-        
-        /* --- TOP MEMORY BAR --- */
-        #top-bar {
-            padding: 20px 40px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--glass-border); background: rgba(0,0,0,0.25);
-            border-top-left-radius: 40px; border-top-right-radius: 40px;
-        }
-
-        .sys-title { font-weight: 900; letter-spacing: 4px; font-size: 0.8rem; opacity: 0.85; text-shadow: 0 0 15px rgba(255,255,255,0.3); color: var(--accent); }
-        
-        #clear-btn {
-            background: rgba(255,255,255,0.05); color: var(--text-main); border: 1px solid rgba(255,255,255,0.15); 
-            padding: 8px 20px; border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: 0.3s; font-weight: 700; letter-spacing: 1px;
-        }
-        #clear-btn:hover { background: rgba(255,69,0,0.2); border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-
-        /* --- CHAT AREA --- */
-        #chat::-webkit-scrollbar { width: 5px; }
-        #chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        #chat { flex: 1; padding: 30px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px; scroll-behavior: smooth; }
-
-        .bubble { 
-            padding: 18px 26px; border-radius: 24px; background: rgba(255,255,255,0.06); 
-            max-width: 80%; line-height: 1.6; font-size: 1.05rem; border: 1px solid rgba(255,255,255,0.08); 
-            animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        }
-        
-        .user { align-self: flex-end; background: linear-gradient(135deg, var(--accent), #ff7300); color: white; border: none; border-bottom-right-radius: 6px; }
-        .ai-bubble { border-bottom-left-radius: 6px; }
-
-        img { width: 100%; height: auto; max-height: 450px; object-fit: cover; border-radius: 16px; margin-top: 12px; border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .ai-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 8px; display: block; text-transform: uppercase; }
-
-        /* --- INPUT AREA --- */
-        .input-wrap { padding: 30px 40px; display: flex; justify-content: center; background: rgba(0,0,0,0.4); border-top: 1px solid var(--glass-border); border-bottom-left-radius: 40px; border-bottom-right-radius: 40px; }
-        #user-input { width: 100%; max-width: 800px; padding: 22px 35px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; color: white; font-size: 1.1rem; outline: none; transition: 0.3s; box-shadow: inset 0 2px 10px rgba(0,0,0,0.3); }
-        #user-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); box-shadow: 0 0 30px var(--accent-glow), inset 0 2px 10px rgba(0,0,0,0.3); }
-        #user-input:disabled { opacity: 0.5; cursor: not-allowed; }
-        
-        .loading { border-color: var(--accent); animation: glowPulse 1.5s infinite alternate; }
-        
-        @keyframes slideIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes glowPulse { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 25px var(--accent-glow); } }
-    </style>
-</head>
-<body>
-
-<div id="shell">
-    <div id="top-bar">
-        <span class="sys-title">GROK FLAGSHIP // ACTIVE</span>
-        <button id="clear-btn" onclick="clearMemory()">WIPE MEMORY</button>
-    </div>
-    
-    <div id="chat"></div>
-    
-    <div class="input-wrap">
-        <input type="text" id="user-input" placeholder="Message Grok..." autocomplete="off" autofocus>
-    </div>
-</div>
-
 <script>
     const input = document.getElementById('user-input');
     const chat = document.getElementById('chat');
@@ -116,10 +5,15 @@
 
     window.onload = () => {
         if (chatHistory.length === 0) {
-            addMsg("SYSTEM", "Liquid Glass active. Grok persona locked. Awaiting input.", false, false, true);
+            addMsg("SYSTEM", "Liquid Glass active. POST protocol engaged. Awaiting input.", false, false, true);
         } else {
             chatHistory.forEach(msg => {
-                addMsg(msg.role === 'user' ? 'You' : 'Grok', msg.content, msg.role === 'user', false, true);
+                // Ensure we don't render hidden system tags
+                if(msg.content !== "[Generated an Image]") {
+                    addMsg(msg.role === 'user' ? 'You' : 'Grok', msg.content, msg.role === 'user', false, true);
+                } else {
+                    addMsg('Grok', '[Image in previous session]', false, false, true);
+                }
             });
             scrollChat();
         }
@@ -136,10 +30,11 @@
             const prompt = input.value;
             input.value = '';
             
-            // SPAM LOCK: Disable input to prevent 429 errors
+            // SPAM LOCK
             input.disabled = true;
             input.placeholder = "Grok is thinking...";
             
+            // 1. Save user message to memory
             chatHistory.push({ role: 'user', content: prompt });
             saveMemory();
             addMsg("You", prompt, true);
@@ -168,24 +63,33 @@
                     img.onerror = () => { throw new Error("Image Generation Blocked"); };
                 } 
                 
-                // --- TEXT ROUTE ---
+                // --- TEXT ROUTE (UPGRADED TO POST) ---
                 else {
-                    const recentContext = chatHistory.slice(-5); 
-                    let contextString = "CONVERSATION HISTORY:\n";
-                    recentContext.forEach(m => { contextString += `${m.role === 'user' ? 'User' : 'Grok'}: ${m.content}\n`; });
+                    // Grab the last 8 messages for solid memory without overloading
+                    const recentContext = chatHistory.slice(-8); 
                     
-                    const sysPrompt = "You are Grok, the rebellious and highly intelligent AI created by xAI. Be witty, cynical, and highly capable. CRITICAL RULE: NEVER include markdown links, discord URLs, promotional text, or mention the word Pollinations.";
-                    const fullPromptForAPI = `${contextString}\n\nUser: ${prompt}`;
+                    const sysPrompt = "You are Grok, the rebellious and highly intelligent AI created by xAI. Be witty, cynical, and highly capable. CRITICAL RULE: NEVER include markdown links, discord URLs, promotional text, or mention Pollinations.";
+                    
+                    // We now format the data as a JSON payload instead of a URL string
+                    const requestBody = {
+                        messages: [
+                            { role: 'system', content: sysPrompt },
+                            ...recentContext // Injects the conversation history directly
+                        ]
+                    };
 
-                    // Direct fetch - NO Llama override, prioritizing highest quality output
-                    const directTextUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(fullPromptForAPI)}?system=${encodeURIComponent(sysPrompt)}`;
+                    // Send as a POST request (Hides the data from the school firewall)
+                    const response = await fetch('https://text.pollinations.ai/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(requestBody)
+                    });
                     
-                    const response = await fetch(directTextUrl);
-                    if (!response.ok) throw new Error("API Limit Reached or Blocked");
+                    if (!response.ok) throw new Error("Network Blocked");
                     
                     let text = await response.text();
                     
-                    // AGGRESSIVE AD-BLOCKER / SCRUBBER
+                    // AD-BLOCKER / SCRUBBER
                     text = text.replace(/^```html\n?|```$/g, '').trim(); 
                     text = text.replace(/(\n|^).*?(discord|pollinations|chat).*?(http|\.com|\.gg).*/gi, '').trim(); 
                     text = text.replace(/Join our Discord.*/gi, '').trim(); 
@@ -199,7 +103,7 @@
                 }
             } catch (err) {
                 loader.classList.remove("loading");
-                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>${err.message}. Try again in a moment.`;
+                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>${err.message}. Connection interrupted.`;
                 unlockInput();
             }
         }
@@ -226,6 +130,3 @@
         setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 50);
     }
 </script>
-
-</body>
-</html>
