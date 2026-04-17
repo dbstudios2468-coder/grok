@@ -3,39 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MultiGPT | Stealth Glass</title>
+    <title>MultiGPT | Stealth Glass Optimized</title>
+    
+    <link rel="preconnect" href="https://text.pollinations.ai" crossorigin>
+    <link rel="preconnect" href="https://image.pollinations.ai" crossorigin>
+
     <style>
-        :root { --bg: #050505; --glass: rgba(255, 255, 255, 0.03); --accent: #ff4500; }
-        body, html { margin: 0; padding: 0; height: 100%; background: var(--bg); font-family: 'Segoe UI', system-ui, sans-serif; color: white; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-        #shell { width: 92vw; height: 88vh; background: var(--glass); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px; display: flex; flex-direction: column; position: relative; box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+        :root { 
+            --bg-dark: #050505; 
+            --glass-bg: rgba(20, 20, 25, 0.4); 
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent: #ff4500; 
+            --accent-glow: rgba(255, 69, 0, 0.3);
+            --text-main: #f0f0f0;
+        }
+
+        /* Moving Liquid Background */
+        body, html { 
+            margin: 0; padding: 0; height: 100%; 
+            background: radial-gradient(circle at 50% 50%, #111, var(--bg-dark));
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            color: var(--text-main); 
+            display: flex; justify-content: center; align-items: center; 
+            overflow: hidden;
+        }
+
+        /* The App Container */
+        #shell { 
+            width: 90vw; height: 88vh; max-width: 1200px;
+            background: var(--glass-bg); 
+            backdrop-filter: blur(35px) saturate(180%); 
+            -webkit-backdrop-filter: blur(35px) saturate(180%); 
+            border: 1px solid var(--glass-border); 
+            border-radius: 35px; 
+            display: flex; flex-direction: column; 
+            box-shadow: 0 25px 80px rgba(0,0,0,0.8), inset 0 0 40px rgba(255,255,255,0.02); 
+            transition: all 0.3s ease;
+        }
         
-        #chat { flex: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; scrollbar-width: none; }
-        .bubble { padding: 15px 22px; border-radius: 20px; background: rgba(255,255,255,0.06); max-width: 85%; line-height: 1.5; font-size: 0.95rem; border: 1px solid rgba(255,255,255,0.05); }
-        .user { align-self: flex-end; background: var(--accent); font-weight: 600; box-shadow: 0 4px 15px rgba(255,69,0,0.2); border: none; }
+        /* Custom Scrollbar for sleek UI */
+        #chat::-webkit-scrollbar { width: 6px; }
+        #chat::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        #chat { 
+            flex: 1; padding: 35px 40px; overflow-y: auto; 
+            display: flex; flex-direction: column; gap: 20px; 
+            scroll-behavior: smooth;
+        }
+
+        /* Chat Bubbles */
+        .bubble { 
+            padding: 16px 24px; border-radius: 24px; 
+            background: rgba(255,255,255,0.04); 
+            max-width: 82%; line-height: 1.6; font-size: 0.98rem; 
+            border: 1px solid rgba(255,255,255,0.03); 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            opacity: 0; transform: translateY(15px);
+        }
         
-        .input-wrap { padding: 25px; display: flex; justify-content: center; background: rgba(0,0,0,0.2); border-bottom-left-radius: 30px; border-bottom-right-radius: 30px; }
-        #user-input { width: 100%; max-width: 600px; padding: 18px 28px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); border-radius: 100px; color: white; font-size: 1rem; outline: none; transition: 0.3s; }
-        #user-input:focus { border-color: var(--accent); background: rgba(255,255,255,0.12); box-shadow: 0 0 20px rgba(255,69,0,0.3); }
+        .user { 
+            align-self: flex-end; 
+            background: linear-gradient(135deg, var(--accent), #ff7300); 
+            color: white; font-weight: 500; 
+            box-shadow: 0 8px 25px var(--accent-glow); 
+            border: none;
+            border-bottom-right-radius: 6px;
+        }
+
+        .ai-bubble { border-bottom-left-radius: 6px; }
+
+        /* IMAGE FIX: Prevents stretching, scales perfectly */
+        img { 
+            width: 100%; 
+            height: auto; 
+            max-height: 450px; 
+            object-fit: cover; /* Ensures perfect aspect ratio */
+            border-radius: 16px; 
+            margin-top: 12px; 
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2); /* Placeholder color while loading */
+        }
         
-        .ai-label { font-size: 0.65rem; font-weight: 900; letter-spacing: 2px; opacity: 0.5; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        img { max-width: 100%; border-radius: 15px; margin-top: 10px; }
+        .ai-label { 
+            font-size: 0.65rem; font-weight: 800; letter-spacing: 1.5px; 
+            opacity: 0.6; margin-bottom: 6px; display: block; text-transform: uppercase; 
+        }
+
+        /* Input Area */
+        .input-wrap { 
+            padding: 25px 40px; display: flex; justify-content: center; 
+            background: rgba(0,0,0,0.3); border-top: 1px solid var(--glass-border);
+            border-bottom-left-radius: 35px; border-bottom-right-radius: 35px; 
+        }
+
+        #user-input { 
+            width: 100%; max-width: 750px; padding: 20px 30px; 
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); 
+            border-radius: 100px; color: white; font-size: 1.05rem; 
+            outline: none; transition: 0.3s; 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        #user-input:focus { 
+            border-color: var(--accent); background: rgba(255,255,255,0.08); 
+            box-shadow: 0 0 25px var(--accent-glow), inset 0 2px 5px rgba(0,0,0,0.2); 
+        }
         
-        /* Loading Animation */
-        .loading { animation: pulse 1.5s infinite; opacity: 0.7; }
-        @keyframes pulse { 50% { opacity: 0.3; } }
+        /* Sleek Loading Pulse */
+        .loading { border-color: var(--accent); animation: glowPulse 1.5s infinite alternate; }
+        
+        @keyframes slideIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes glowPulse { from { box-shadow: 0 0 5px var(--accent-glow); } to { box-shadow: 0 0 20px var(--accent-glow); } }
+
     </style>
 </head>
 <body>
 
 <div id="shell">
     <div id="chat">
-        <div class="bubble">
+        <div class="bubble ai-bubble" style="opacity: 1; transform: translateY(0);">
             <span class="ai-label">SYSTEM</span>
-            Stealth connection established. Bypassing auth protocols. Ready for input.
+            Stealth Glass UI Optimized. Pre-connections active. Zero image stretching. Ready.
         </div>
     </div>
     <div class="input-wrap">
-        <input type="text" id="user-input" placeholder="Type a message or ask for an image..." autocomplete="off">
+        <input type="text" id="user-input" placeholder="Type a message or ask to generate an image..." autocomplete="off" autofocus>
     </div>
 </div>
 
@@ -48,29 +141,35 @@
             const prompt = input.value;
             input.value = '';
             
-            // Add user message
+            // Render user message instantly
             addMsg("You", prompt, true);
             
-            // Add loading state
-            const loader = addMsg("Engine", "Bypassing firewall...", false, true);
+            // Render fast-loading state
+            const loader = addMsg("Engine", "Bypassing protocols...", false, true);
             
             try {
                 const lowerPrompt = prompt.toLowerCase();
                 
-                // IMAGE ROUTE
-                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture")) {
-                    // Pollinations image generation (Keyless)
-                    const safePrompt = encodeURIComponent(prompt);
-                    const randomSeed = Math.floor(Math.random() * 100000);
-                    const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=800&height=400&nologo=true`;
+                // --- IMAGE ROUTE ---
+                if (lowerPrompt.includes("draw") || lowerPrompt.includes("image") || lowerPrompt.includes("picture") || lowerPrompt.includes("generate")) {
                     
-                    loader.classList.remove("loading");
-                    loader.innerHTML = `<span class="ai-label">VISION</span><img src="${imageUrl}" alt="Generated Image" onload="scrollChat()">`;
+                    const safePrompt = encodeURIComponent(prompt);
+                    const randomSeed = Math.floor(Math.random() * 1000000);
+                    
+                    // Fixed: Requesting 1024x1024 high-res square. CSS auto-height prevents stretching.
+                    const imageUrl = `https://image.pollinations.ai/prompt/${safePrompt}?seed=${randomSeed}&width=1024&height=1024&nologo=true`;
+                    
+                    // Preload image in JS for instant snap-in
+                    const img = new Image();
+                    img.src = imageUrl;
+                    img.onload = () => {
+                        loader.classList.remove("loading");
+                        loader.innerHTML = `<span class="ai-label">VISION</span><img src="${imageUrl}" alt="Generated Image">`;
+                        scrollChat();
+                    };
                 } 
-                // TEXT ROUTE
+                // --- TEXT ROUTE ---
                 else {
-                    // Pollinations text generation (Keyless)
-                    // We prompt it to act like Grok
                     const sysPrompt = "You are Grok, a witty, rebellious, and highly intelligent AI.";
                     const encodedUrl = `https://text.pollinations.ai/prompt/${encodeURIComponent(prompt)}?system=${encodeURIComponent(sysPrompt)}`;
                     
@@ -78,20 +177,24 @@
                     if (!response.ok) throw new Error("Network blocked");
                     
                     const text = await response.text();
+                    
+                    // Strip weird markdown wrappers if they appear
+                    const cleanText = text.replace(/^```html\n?|```$/g, '');
+                    
                     loader.classList.remove("loading");
-                    loader.innerHTML = `<span class="ai-label">GROK</span>${text}`;
+                    loader.innerHTML = `<span class="ai-label">GROK</span>${cleanText}`;
+                    scrollChat();
                 }
             } catch (err) {
                 loader.classList.remove("loading");
-                loader.innerHTML = `<span class="ai-label">ERROR</span>The school network is actively dropping the connection.`;
+                loader.innerHTML = `<span class="ai-label" style="color: #ff4444;">ERROR</span>Network timeout or blocked request.`;
             }
-            scrollChat();
         }
     });
 
     function addMsg(sender, text, isUser = false, isLoading = false) {
         const div = document.createElement('div');
-        div.className = `bubble ${isUser ? 'user' : ''} ${isLoading ? 'loading' : ''}`;
+        div.className = `bubble ${isUser ? 'user' : 'ai-bubble'} ${isLoading ? 'loading' : ''}`;
         div.innerHTML = `<span class="ai-label">${sender}</span>${text}`;
         chat.appendChild(div);
         scrollChat();
@@ -99,7 +202,10 @@
     }
 
     function scrollChat() {
-        chat.scrollTop = chat.scrollHeight;
+        // Smooth scroll to the absolute bottom
+        setTimeout(() => {
+            chat.scrollTop = chat.scrollHeight;
+        }, 50);
     }
 </script>
 
